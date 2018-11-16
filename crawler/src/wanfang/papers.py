@@ -179,7 +179,7 @@ def downloadAllPdf(key):
                 get_pdf(geturl, title)
             except BaseException as e:
                 print("has except")
-                print(e.message)
+                print(e)
                 continue
             finally:
                 print("all downloads is", num)
