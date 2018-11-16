@@ -8,7 +8,6 @@ import re
 import os
 from bs4 import BeautifulSoup
 import bs4
-from urllib import parse
 from multiprocessing import Pool
 import xlwt
 
@@ -186,9 +185,12 @@ def downloadAllPdf(key):
 
 
 def main():
-    # 自己输入关键字，检索
-    key = '血液透析机系统的软硬件设计与实现'
-    downloadAllPdf(key)
+    with open(r'2018-11-16下午4-4-37@WanFangdata.txt', 'r') as f:
+        paper_titles = f.readlines()
+    for line in paper_titles:
+        if len(line)>5:
+            title = line.lstrip('【篇名】').rstrip()
+            downloadAllPdf(title)
 
 
 if __name__ == '__main__':
