@@ -177,7 +177,7 @@ def downloadAllPdf(key):
                 print("下载：", title)
                 geturl = getdownurl(url)
                 get_pdf(geturl, title)
-            except BaseException,e:
+            except BaseException as e:
                 print("has except")
                 print(e.message)
                 continue
@@ -189,7 +189,7 @@ def main():
     with open(r'2018-11-16下午4-4-37@WanFangdata.txt', 'r') as f:
         paper_titles = f.readlines()
     for line in paper_titles:
-        if len(line)>5:
+        if len(line) > 5:
             title = line.lstrip('【篇名】').strip()
             downloadAllPdf(title)
 
