@@ -177,8 +177,9 @@ def downloadAllPdf(key):
                 print("下载：", title)
                 geturl = getdownurl(url)
                 get_pdf(geturl, title)
-            except:
+            except BaseException,e:
                 print("has except")
+                print(e.message)
                 continue
             finally:
                 print("all downloads is", num)
