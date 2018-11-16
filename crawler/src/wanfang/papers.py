@@ -26,18 +26,21 @@ def get_html(url):
 
 
 def getNum(key):
-    head = "http://www.wanfangdata.com.cn/search/searchList.do?searchType=all&showType=&searchWord="
+    head = "http://www.wanfangdata.com.cn/search/searchList.do?searchType=degree&showType=&searchWord="
     end = "&isTriggerTag="
     url = head + key + end
-    re1 = r'\s*找到<strong>(.*?)</strong>条结果'
+    # re1 = r'\s*找到<strong>(.*?)</strong>条结果'
+    re1 = r'\s*找到 <span>(.*?)</span> 条结果'
     html = get_html(url).text
     if html == None:
         print("没有文献")
-        return;
-    strnum = re.findall(re1, html)
-    num = int(strnum[0])
+        return
+    bs = BeautifulSoup(html, 'html.parser')
+    strnum = bs.select('.BatchOper_result_show span')[0].text
+    # strnum = re.findall(re1, html)
+    num = int(strnum)
     # print("找到了：",num)
-    return num;
+    return num
 
 
 def search_key(key):
@@ -51,16 +54,16 @@ def search_key(key):
     html = get_html(url).text
     if html == None:
         print("text empty")
-        return;
+        return
     num = getNum(key)
     print("找到了：", num)
     if num > 20:
-        if (num % 20 != 0):
+        if num % 20 != 0:
             page = num // 20 + 1
         else:
             page = num // 20
     # page>1 url
-    head = 'http://www.wanfangdata.com.cn/search/searchList.do?searchType=all&pageSize=20&page='
+    head = 'http://www.wanfangdata.com.cn/search/searchList.do?searchType=degree&pageSize=20&page='
     end = '&searchWord=' + key + '&order=correlation&showType=detail&isCheck=check&isHit=&isHitUnit=&firstAuthor=false&rangeParame=all'
     for i in range(2, page + 1):
         url = head + str(i) + end
