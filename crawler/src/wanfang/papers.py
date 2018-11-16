@@ -189,7 +189,7 @@ def main():
         paper_titles = f.readlines()
     for line in paper_titles:
         if len(line)>5:
-            title = line.lstrip('【篇名】').rstrip()
+            title = line.lstrip('【篇名】').strip()
             downloadAllPdf(title)
 
 
