@@ -164,28 +164,26 @@ def downloadAllPdf(key):
             # 得到每一篇文献的信息，写入文件
             num += 1
 
-            # re0 = r'<title>(.*?)</title>'
-            # text = get_html(url).text
-            # title = re.findall(re0, text)[0]
-            # print("下载：", title)
-            # geturl = getdownurl(url)
-            # get_pdf(geturl, title)
-            # print("has except")
-            #
-            # print("all downloads is", num)
-            try:
-                re0 = r'<title>(.*?)</title>'
-                text = get_html(url).text
-                title = re.findall(re0, text)[0]
-                print("下载：", title)
-                geturl = getdownurl(url)
-                get_pdf(geturl, title)
-            except BaseException as e:
-                print("has except")
-                print(e)
-                continue
-            finally:
-                print("all downloads is", num)
+            re0 = r'<title>(.*?)</title>'
+            text = get_html(url).text
+            title = re.findall(re0, text)[0]
+            print("下载：", title)
+            geturl = getdownurl(url)
+            get_pdf(geturl, title)
+            print("all downloads is", num)
+            # try:
+            #     re0 = r'<title>(.*?)</title>'
+            #     text = get_html(url).text
+            #     title = re.findall(re0, text)[0]
+            #     print("下载：", title)
+            #     geturl = getdownurl(url)
+            #     get_pdf(geturl, title)
+            # except BaseException as e:
+            #     print("has except")
+            #     print(e)
+            #     continue
+            # finally:
+            #     print("all downloads is", num)
 
 
 def main():
