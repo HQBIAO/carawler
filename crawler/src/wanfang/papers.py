@@ -3,13 +3,8 @@
 # author:chenjunbiao
 
 import requests
-import time
 import re
-import os
 from bs4 import BeautifulSoup
-import bs4
-from multiprocessing import Pool
-import xlwt
 
 
 def get_html(url):
@@ -17,7 +12,6 @@ def get_html(url):
         header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.90 Safari/537.36 2345Explorer/9.3.2.17331', }
         r = requests.get(url, headers=header, verify=False)
-        r.raise_for_status
         r.encoding = r.apparent_encoding
         # print(r.text)
         return r
@@ -29,17 +23,11 @@ def getNum(key):
     head = "http://www.wanfangdata.com.cn/search/searchList.do?searchType=degree&showType=&searchWord="
     end = "&isTriggerTag="
     url = head + key + end
-    # re1 = r'\s*找到<strong>(.*?)</strong>条结果'
-    re1 = r'\s*找到 <span>(.*?)</span> 条结果'
     html = get_html(url).text
-    if html == None:
-        print("没有文献")
-        return
     bs = BeautifulSoup(html, 'html.parser')
-    strnum = bs.select('.BatchOper_result_show span')[0].text
-    # strnum = re.findall(re1, html)
+    el = bs.select('.BatchOper_result_show span')
+    strnum = el[0].text if el else 0
     num = int(strnum)
-    # print("找到了：",num)
     return num
 
 
@@ -56,7 +44,7 @@ def search_key(key):
         print("text empty")
         return
     num = getNum(key)
-    print("找到了：", num)
+    print("找到了关于标题 '" + key + "'： 的文章篇数为：", num)
     if num > 20:
         if num % 20 != 0:
             page = num // 20 + 1
@@ -119,7 +107,7 @@ def get_url(urls):
 
 def get_pdf(url, title):
     text = get_html(url)
-    path = "/home/dflx/下载/万方数据库/深度学习/" + title + ".pdf"
+    path = "/Users/chenjunbiao/project/carawler/crawler/src/wanfang/data/" + title + ".pdf"
     with open(path, 'wb') as f:
         f.write(text.content)
     print("successf")
@@ -128,15 +116,14 @@ def get_pdf(url, title):
 def getdownurl(url):
     text = get_html(url).text
     re0 = r'<a onclick="upload\((.*?)\)"'
-    firurl = re.findall(re0, text)
-    print(firurl)
-    if len(firurl) == 0:
+    fir_url = re.findall(re0, text)
+    print(fir_url)
+    if len(fir_url) == 0:
         return
-    strurl = str(firurl[0])
+    strurl = ''.join(e for e in fir_url[0])
     print(strurl)
-    tpurl = re.split(',', strurl)
+    tpurl = re.split("','", strurl)
     endstp = []
-    # print(tpurl)
     for ul in tpurl:
         elem = ul.strip('\'').strip('\'')
         endstp.append(elem)
@@ -144,12 +131,12 @@ def getdownurl(url):
     head = 'http://www.wanfangdata.com.cn/search/downLoad.do?page_cnt='
     geturl = head + endstp[0] + "&language=" + endstp[2] + "&resourceType=" + endstp[6] + "&source=" + endstp[
         3] + "&resourceId=" + endstp[1] + "&resourceTitle=" + endstp[4] + "&isoa=" + endstp[5] + "&type=" + endstp[0]
-    print(geturl)
+    print('The download page url is: ' + geturl)
+    # geturl = 'http://www.wanfangdata.com.cn/search/downLoad.do?page_cnt=51&language=chi&resourceType=degree&source=[WF, CNKI]&resourceId=D701708&resourceTitle=三毛的流浪人生与精神抒写&isoa=0&type=degree&first=null'
     re1 = r'<iframe style="display:none" id="downloadIframe" src="(.*?)">'
     text = get_html(geturl).text
-    print()
     sucurl = re.findall(re1, text)
-    print(sucurl)
+    print('资源下载地址：' + sucurl[0])
     return sucurl[0]
 
 
@@ -163,27 +150,19 @@ def downloadAllPdf(key):
         for url in allurl:
             # 得到每一篇文献的信息，写入文件
             num += 1
-
-            re0 = r'<title>(.*?)</title>'
-            text = get_html(url).text
-            title = re.findall(re0, text)[0]
-            print("下载：", title)
-            geturl = getdownurl(url)
-            get_pdf(geturl, title)
-            print("all downloads is", num)
-            # try:
-            #     re0 = r'<title>(.*?)</title>'
-            #     text = get_html(url).text
-            #     title = re.findall(re0, text)[0]
-            #     print("下载：", title)
-            #     geturl = getdownurl(url)
-            #     get_pdf(geturl, title)
-            # except BaseException as e:
-            #     print("has except")
-            #     print(e)
-            #     continue
-            # finally:
-            #     print("all downloads is", num)
+            try:
+                re0 = r'<title>(.*?)</title>'
+                text = get_html(url).text
+                title = re.findall(re0, text)[0]
+                print("下载：", title)
+                geturl = getdownurl(url)
+                get_pdf(geturl, title)
+            except BaseException as e:
+                print("下载失败：" + title)
+                print(e)
+                continue
+            finally:
+                print("all downloads is", num)
 
 
 def main():
