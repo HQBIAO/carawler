@@ -7,7 +7,7 @@ import re
 import time
 from bs4 import BeautifulSoup
 
-from crawler.src.wanfang.papers import get_html, get_pdf
+from papers import get_html, get_pdf
 
 
 def extract_download_url(text):
