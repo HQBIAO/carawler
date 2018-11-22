@@ -1,7 +1,10 @@
 # coding=utf-8
 # date:下午8:48 
 # author:chenjunbiao
+import random
 import re
+
+import time
 from bs4 import BeautifulSoup
 
 from crawler.src.wanfang.papers import get_html, get_pdf
@@ -41,7 +44,10 @@ def get_degree_papers(page_start, page_end):
         html = get_html(url).text
         down_urls,titles = extract_download_url(html)
         for i in range(len(down_urls)):
+            sleep_time = random.randint(1,10)
+            time.sleep(sleep_time)
+            print("开始下载："+titles[i]+" ----------------------------------")
             get_pdf(down_urls[i],titles[i])
 
-
-get_degree_papers(1, 1)
+if __name__=='__main__':
+    get_degree_papers(1, 10)

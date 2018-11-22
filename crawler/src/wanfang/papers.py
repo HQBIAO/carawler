@@ -105,9 +105,10 @@ def get_url(urls):
 #     return sucurl[0]
 
 
-def get_pdf(url, title):
+def get_pdf(url, title,page=0):
     text = get_html(url)
-    path = "/Users/chenjunbiao/project/carawler/crawler/src/wanfang/data/" + title + ".pdf"
+    # path = "/Users/chenjunbiao/project/carawler/crawler/src/wanfang/data/" + title + ".pdf"
+    path = "/home/zengchuan/wanfang/"+str(page) + title + ".pdf"
     with open(path, 'wb') as f:
         f.write(text.content)
     print("successf")
