@@ -13,6 +13,8 @@ from papers import get_html, get_pdf
 def extract_download_url(text):
     bs = BeautifulSoup(text, 'html.parser')
     a_tag_down = bs.select('.result_opera_down')
+    if len(a_tag_down) < 1 and 'onclick' not in a_tag_down[0]:
+        return None, None
     print(a_tag_down[0]['onclick'])
     tp_list = [tag['onclick'].lstrip('downLoad(').rstrip(')').split("','") for tag in a_tag_down]
     print(tp_list)
@@ -43,6 +45,8 @@ def get_degree_papers(page_start, page_end):
         url = str.format(base_url, str(index))
         html = get_html(url).text
         down_urls, titles = extract_download_url(html)
+        if not down_urls:
+            continue
         for i in range(len(down_urls)):
             sleep_time = random.randint(1, 10)
             time.sleep(sleep_time)
