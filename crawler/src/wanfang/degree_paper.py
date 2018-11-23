@@ -17,7 +17,7 @@ def extract_download_url(text):
     tp_list = [tag['onclick'].lstrip('downLoad(').rstrip(')').split("','") for tag in a_tag_down]
     print(tp_list)
     down_urls = []
-    titles=[]
+    titles = []
     for tp in tp_list:
         endstp = [el.strip("'") for el in tp]
         head = 'http://www.wanfangdata.com.cn/search/downLoad.do?page_cnt='
@@ -34,7 +34,7 @@ def extract_download_url(text):
         source_url = re.findall(re1, text)
         print('资源下载地址：' + source_url[0])
         down_urls.append(source_url[0])
-    return down_urls,titles
+    return down_urls, titles
 
 
 def get_degree_papers(page_start, page_end):
@@ -42,12 +42,13 @@ def get_degree_papers(page_start, page_end):
     for index in range(page_start, page_end + 1):
         url = str.format(base_url, str(index))
         html = get_html(url).text
-        down_urls,titles = extract_download_url(html)
+        down_urls, titles = extract_download_url(html)
         for i in range(len(down_urls)):
-            sleep_time = random.randint(1,10)
+            sleep_time = random.randint(1, 10)
             time.sleep(sleep_time)
-            print("开始下载："+titles[i]+" ----------------------------------")
-            get_pdf(down_urls[i],titles[i])
+            print("开始下载：" + titles[i] + " ----------------------------------")
+            get_pdf(down_urls[i], titles[i], i)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     get_degree_papers(1, 10)
