@@ -50,8 +50,8 @@ def get_degree_papers(page_start, page_end):
         for i in range(len(down_urls)):
             sleep_time = random.randint(1, 10)
             time.sleep(sleep_time)
-            print("开始下载：" + titles[i] + " ----------------------------------")
-            get_pdf(down_urls[i], titles[i], i)
+            print("开始下载第"+str(index)+"页的：" + titles[i] + " ----------------------------------")
+            get_pdf(down_urls[i], titles[i], index)
 
 
 if __name__ == '__main__':
