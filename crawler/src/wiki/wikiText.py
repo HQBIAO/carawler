@@ -24,7 +24,7 @@ def get_content(key_word):
 
 
 if __name__ == '__main__':
-    db = pymysql.connect("112.74.189.216", "root", "Qwe@1234", "wiki", charset='utf8')
+
     cursor = db.cursor()
     select_sql = "SELECT * FROM figure_name  WHERE has_text = '%d' limit 1" % (0)
     while True:
