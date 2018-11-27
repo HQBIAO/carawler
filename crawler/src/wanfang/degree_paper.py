@@ -55,4 +55,5 @@ def get_degree_papers(page_start, page_end):
 
 
 if __name__ == '__main__':
-    get_degree_papers(1, 10)
+    # get_degree_papers(1, 10)
+    get_degree_papers(5, 10)
