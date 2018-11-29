@@ -1,6 +1,7 @@
 # coding=utf-8
 # date:下午2:51 
 # author:chenjunbiao
+import json
 
 import requests
 import re
@@ -105,10 +106,10 @@ def get_url(urls):
 #     return sucurl[0]
 
 
-def get_pdf(url, title,page=0):
+def get_pdf(url, title, page=0):
     text = get_html(url)
     # path = "/Users/chenjunbiao/project/carawler/crawler/src/wanfang/data/" + title + ".pdf"
-    path = "/home/zengchuan/wanfang/"+str(page) +"/"+ title + ".pdf"
+    path = "/home/zengchuan/wanfang/" + str(page) + "/" + title + ".pdf"
     with open(path, 'wb') as f:
         f.write(text.content)
     print("successf")
@@ -164,6 +165,14 @@ def downloadAllPdf(key):
                 continue
             finally:
                 print("all downloads is", num)
+
+
+def post_json(url, param):
+    res = requests.post(url, param)
+    res.encoding = 'utf-8'
+    text = res.text
+    json_str = json.loads(text)
+    return json_str
 
 
 def main():
