@@ -145,7 +145,7 @@ def ref_download_page(type, id):
     :param id: 文献id
     :return:
     """
-    url = "/asynRetrieval/docPaper.do"
+    url = "http://www.wanfangdata.com.cn/asynRetrieval/docPaper.do"
     param = {"_type": type,
              "id": id,
              "number": 1,
