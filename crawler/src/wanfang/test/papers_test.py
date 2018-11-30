@@ -2,10 +2,15 @@
 # date:上午9:43 
 # author:chenjunbiao
 
-import unittest
+import os
+import sys
 
+import unittest
+import sys
+
+sys.path.append('/Users/chenjunbiao/project/carawler/')
 from crawler.src.wanfang.degree_paper import title_id_pair, save_title_id_pair, get_reference_in_wanfang, \
-    get_batch_reference, ref_paper_info
+    get_batch_reference, ref_download_page
 from crawler.src.wanfang.papers import post_json
 import pandas as pd
 
@@ -44,4 +49,5 @@ class TestPapers(unittest.TestCase):
         df.to_csv('reference_title.csv', index=False)
 
     def test_ref_paper_info(self):
-        ref_paper_info('degree', 'Y2284853')
+        self.skipTest('skip')
+        ref_download_page('degree', 'Y2284853')

@@ -138,15 +138,27 @@ def get_batch_reference(title_id_pair):
     return df_references
 
 
-def ref_paper_info(type, id):
+def ref_download_page(type, id):
+    """
+    参考文献下载页面的地址
+    :param type: 文献类型
+    :param id: 文献id
+    :return:
+    """
     url = "/asynRetrieval/docPaper.do"
     param = {"_type": type,
              "id": id,
              "number": 1,
              "first": 'undefined'}
-    result = post_json(url,param)
+    result = post_json(url, param)
     ll = "/search/downLoad.do?language=" + result.language + "&resourceType=" + type + "&source=" + result.source_db + "&resourceId=" + result.article_id + "&resourceTitle=" + result.title + "";
     return ll
+
+
+def down_ref(ref_down_url, title):
+    source_url = __source_url__(ref_down_url)
+    # todo
+    get_pdf(source_url, title)
 
 
 if __name__ == '__main__':
