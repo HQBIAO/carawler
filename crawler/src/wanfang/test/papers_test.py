@@ -10,7 +10,7 @@ import sys
 
 sys.path.append('/Users/chenjunbiao/project/carawler/')
 from crawler.src.wanfang.degree_paper import title_id_pair, save_title_id_pair, get_reference_in_wanfang, \
-    get_batch_reference, ref_download_page
+    get_batch_reference, ref_download_page, down_ref
 from crawler.src.wanfang.papers import post_json
 import pandas as pd
 
@@ -48,6 +48,7 @@ class TestPapers(unittest.TestCase):
         df = get_batch_reference(id_title_df)
         df.to_csv('reference_title.csv', index=False)
 
-    def test_ref_paper_info(self):
-        self.skipTest('skip')
-        ref_download_page('degree', 'Y2284853')
+    def test_ref_download(self):
+        # self.skipTest('skip')
+        ll = ref_download_page('degree', 'Y2284853')
+        down_ref(ll, 'test')
