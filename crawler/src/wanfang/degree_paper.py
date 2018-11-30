@@ -10,6 +10,7 @@ from pandas import DataFrame
 
 from papers import get_html, get_pdf, post_json
 import pandas as pd
+import json
 
 
 def __source_url__(down_page_url):
@@ -151,7 +152,8 @@ def ref_download_page(type, id):
              "number": 1,
              "first": 'undefined'}
     result = post_json(url, param)
-    ll = "/search/downLoad.do?language=" + result['language'] + "&resourceType=" + type + "&source=" + result['source_db'] + "&resourceId=" + result['article_id'] + "&resourceTitle=" + result['title'] + ""
+    result = json.loads(result)
+    ll = "/search/downLoad.do?language=" + result['language'] + "&resourceType=" + type + "&source=" + result['source_db'][0] + "&resourceId=" + result['article_id'] + "&resourceTitle=" + result['title'] + ""
     return ll
 
 
