@@ -8,7 +8,7 @@ import sys
 import unittest
 import sys
 
-sys.path.append('/Users/chenjunbiao/project/carawler/')
+sys.path.append('/home/zengchuan/carawler/')
 from crawler.src.wanfang.degree_paper import title_id_pair, save_title_id_pair, get_reference_in_wanfang, \
     get_batch_reference, ref_download_page, down_ref
 from crawler.src.wanfang.papers import post_json
