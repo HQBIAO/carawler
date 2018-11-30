@@ -151,7 +151,7 @@ def ref_download_page(type, id):
              "number": 1,
              "first": 'undefined'}
     result = post_json(url, param)
-    ll = "/search/downLoad.do?language=" + result.language + "&resourceType=" + type + "&source=" + result.source_db + "&resourceId=" + result.article_id + "&resourceTitle=" + result.title + "";
+    ll = "/search/downLoad.do?language=" + result['anguage'] + "&resourceType=" + type + "&source=" + result['source_db'] + "&resourceId=" + result['article_id'] + "&resourceTitle=" + result['title'] + ""
     return ll
 
 
