@@ -7,9 +7,11 @@ import re
 import time
 
 import os
+import sys
 from bs4 import BeautifulSoup
 from pandas import DataFrame
 
+sys.path.append('/home/zengchuan/carawler/')
 from crawler.src.wanfang.readpdf import Mysql
 from papers import get_html, get_pdf, post_json, download_pdf
 import pandas as pd
@@ -228,7 +230,7 @@ def batch_down_ref():
             down_ref(download_page_url, save_path)
             mysql.update(update_sql)
         except BaseException as e:
-            print Title+"   下载失败"
+            print Title + "   下载失败"
             print e
 
 
