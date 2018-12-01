@@ -5,12 +5,16 @@ import random
 import re
 
 import time
+
+import os
 from bs4 import BeautifulSoup
 from pandas import DataFrame
 
-from papers import get_html, get_pdf, post_json
+from crawler.src.wanfang.readpdf import Mysql
+from papers import get_html, get_pdf, post_json, download_pdf
 import pandas as pd
 import json
+import math
 
 
 def __source_url__(down_page_url):
@@ -105,6 +109,11 @@ def save_title_id_pair(page_start, page_end, save_path):
 
 
 def get_reference_in_wanfang(paper_id):
+    """
+    获取一篇文章在万方数据库的参考文献
+    :param paper_id:文章id
+    :return:文章id为paper_id的参考文献列表
+    """
     number = 1
     url = 'http://www.wanfangdata.com.cn/graphical/turnpage.do'
     param = {'type': 'reference', 'id': paper_id, 'number': number}
@@ -124,16 +133,27 @@ def get_reference_in_wanfang(paper_id):
 
 
 def get_batch_reference(title_id_pair):
+    """
+    批量获取参考文献
+    :param title_id_pair:
+    :return:
+    """
     df_references = None
+    is_null = True
     for index, row in title_id_pair.iterrows():
-        paper_title = row['titles']
-        paper_id = row['ids']
-        reference = get_reference_in_wanfang(paper_id)
+        paper_title = row['paper_title']
+        paper_id = row['paper_id']
+        try:
+            reference = get_reference_in_wanfang(paper_id)
+        except BaseException as e:
+            print e
+            print row, '获取失败'
         df_reference = DataFrame(reference)
         df_reference['paper_title'] = paper_title
         df_reference['paper_id'] = paper_id
-        if not df_references:
+        if is_null:
             df_references = df_reference
+            is_null = False
         else:
             df_references = pd.concat([df_references, df_reference])
     return df_references
@@ -151,18 +171,68 @@ def ref_download_page(type, id):
              "id": id,
              "number": 1,
              "first": 'undefined'}
-    result = post_json(url, param)
+    result = None
+    try:
+        result = post_json(url, param)
+    except BaseException as e:
+        print url + "   请求失败"
+        print e
     result = json.loads(result)
-    ll = "/search/downLoad.do?language=" + result['language'] + "&resourceType=" + type + "&source=" + result['source_db'][0] + "&resourceId=" + result['article_id'] + "&resourceTitle=" + result['title'] + ""
+    ll = None
+    try:
+        ll = "http://www.wanfangdata.com.cn/search/downLoad.do?language=" + result[
+            'language'] + "&resourceType=" + type + "&source=" + result['source_db'][0] + "&resourceId=" + result[
+                 'article_id'] + "&resourceTitle=" + result['title'] + ""
+    except BaseException as e:
+        print "下载页地址拼接失败"
+        print e
     return ll
 
 
-def down_ref(ref_down_url, title):
+def down_ref(ref_down_url, save_path):
     source_url = __source_url__(ref_down_url)
     # todo
-    get_pdf(source_url, title)
+    download_pdf(source_url, save_path)
+
+
+def batch_down_ref():
+    with open(r'db_config.txt', 'r') as f:
+        line = f.readline()
+        db_config = line.split(',')
+    mysql = Mysql(db_config[0], db_config[1], db_config[2], db_config[3])
+    mysql.connect()
+    df_reference_title = pd.read_csv('test/reference_title.csv')
+    for index, row in df_reference_title.iterrows():
+        HasFulltext = row['HasFulltext']
+        if not HasFulltext:
+            continue
+        ArticaleId = row['ArticaleId']
+        Title = row['Title']
+        paper_title = row['paper_title']
+        paper_id = row['paper_id']
+        if '%' in Title:
+            Title = Title.split('%')[0]
+        dir_path = 'data/' + paper_title
+        dir_path = os.path.abspath(dir_path)
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        save_path = dir_path + '/' + Title + '.pdf'
+        ref_type = ""
+        if not isinstance(row['Degree'], float):
+            ref_type = 'degree'
+        if not isinstance(row['Periodical'], float):
+            ref_type = 'perio'
+        update_sql = "UPDATE reference_title SET download = 1 WHERE ArticaleId = '%s'" % (ArticaleId)
+        download_page_url = ref_download_page(ref_type, ArticaleId)
+        try:
+            down_ref(download_page_url, save_path)
+            mysql.update(update_sql)
+        except BaseException as e:
+            print Title+"   下载失败"
+            print e
 
 
 if __name__ == '__main__':
     # get_degree_papers(1, 10)
-    get_degree_papers(5, 10)
+    # get_degree_papers(5, 10)
+    batch_down_ref()

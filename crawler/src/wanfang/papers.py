@@ -115,6 +115,18 @@ def get_pdf(url, title, page=0):
     print("successf")
 
 
+def download_pdf(source_url, save_path):
+    """
+    下载pdf文件
+    :param source_url:
+    :param save_path:
+    :return:
+    """
+    text = get_html(source_url)
+    with open(save_path, 'wb') as f:
+        f.write(text.content)
+
+
 def getdownurl(url):
     text = get_html(url).text
     re0 = r'<a onclick="upload\((.*?)\)"'

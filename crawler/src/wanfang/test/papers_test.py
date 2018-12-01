@@ -10,7 +10,7 @@ import sys
 
 sys.path.append('/home/zengchuan/carawler/')
 from crawler.src.wanfang.degree_paper import title_id_pair, save_title_id_pair, get_reference_in_wanfang, \
-    get_batch_reference, ref_download_page, down_ref
+    get_batch_reference, ref_download_page, down_ref, batch_down_ref
 from crawler.src.wanfang.papers import post_json
 import pandas as pd
 
@@ -44,11 +44,14 @@ class TestPapers(unittest.TestCase):
 
     def test_batch_reference(self):
         self.skipTest('skip')
-        id_title_df = pd.read_csv('id_title.csv')
+        id_title_df = pd.read_csv('../degree_paper_with_reference.csv')
         df = get_batch_reference(id_title_df)
-        df.to_csv('reference_title.csv', index=False)
+        df.to_csv('reference_title.csv', encoding='utf-8', index=False)
 
     def test_ref_download(self):
-        # self.skipTest('skip')
+        self.skipTest('skip')
         ll = ref_download_page('degree', 'Y2284853')
         down_ref(ll, 'test')
+
+    def test_batch_down_ref(self):
+        batch_down_ref()

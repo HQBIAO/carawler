@@ -35,7 +35,7 @@ class PaperDoc(object):
         catalog_items = self.catalogtxt.split('\n')
         catalog_items = catalog_items[1:len(catalog_items) - 1]
         for item in catalog_items:
-            if len(item)>5:
+            if len(item) > 5:
                 reference = re.compile('(\\.+)').split(item)
                 # print reference
                 self.catalog.append(reference)
@@ -122,7 +122,7 @@ class PaperDoc(object):
             # 查找第一个目录页
             if re.findall(catalog_exp, page_text) and page_count == 0:
                 last_index = PaperDoc.find_last_index(page_text, '\n')
-                paper_doc.catalogtxt = page_text[0:last_index+1]
+                paper_doc.catalogtxt = page_text[0:last_index + 1]
                 page_count += 1
                 continue
             # 查找第二个目录页
@@ -155,7 +155,7 @@ class PaperDoc(object):
 
 
 class Mysql(object):
-    def __init__(self, host="", password="", database='', user=''):
+    def __init__(self, host="", user='', password="", database=''):
         self.host = host
         self.password = password
         self.database = database
@@ -177,6 +177,9 @@ class Mysql(object):
             self.db.commit()
         except:
             self.db.rollback()
+
+    def update(self, sql):
+        self.insert(sql)
 
 
 ''' from pdfminer.layout import LAParams
