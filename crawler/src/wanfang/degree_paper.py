@@ -205,10 +205,11 @@ def batch_down_ref():
     mysql.connect()
     df_reference_title = pd.read_csv('test/reference_title.csv')
     select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical FROM reference_title  \
-        WHERE HasFulltext = '%s' AND download = %d limit 1" % (True, 1)
+        WHERE HasFulltext = '%s' AND download = %d AND try_times =0 limit 1" % (True, 1)
     result = mysql.fetch_one(select_sql)
     while result:
         ArticaleId = result[0]
+        ArticaleId = ArticaleId[0:ArticaleId.index('^')] if '^' in ArticaleId else ArticaleId
         Title = result[1]
         paper_title = result[2]
         paper_id = result[3]
@@ -230,7 +231,10 @@ def batch_down_ref():
             down_ref(download_page_url, save_path)
             mysql.update(update_sql)
         except BaseException as e:
-            print Title + "   下载失败"
+            print Title + u"--------下载失败"
+            update_try_times = "UPDATE reference_title SET try_times = try_times+1  WHERE ArticaleId = '%s' AND download = 0" % (
+            ArticaleId)
+            mysql.update(update_try_times)
             print e
         result = mysql.fetch_one(select_sql)
 
