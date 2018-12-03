@@ -227,6 +227,7 @@ def batch_down_ref():
             update_down_sql = "update reference_title set download = 1 WHERE id='%d'" % (id)
             mysql.update(update_down_sql)
             print save_path + u" ======已存在"
+            result = mysql.fetch_one(select_sql)
             continue
         ref_type = ""
         if result[4]:
