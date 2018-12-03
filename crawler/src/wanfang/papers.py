@@ -13,8 +13,8 @@ from crawler.src.wiki.utilAgent import choose_ua
 def get_html(url):
     try:
         header = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.90 Safari/537.36 2345Explorer/9.3.2.17331', }
-        r = requests.get(url, headers=choose_ua(), verify=False)
+            'User-Agent': choose_ua(), }
+        r = requests.get(url, headers=header, verify=False)
         r.encoding = r.apparent_encoding
         # print(r.text)
         return r
