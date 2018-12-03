@@ -203,7 +203,7 @@ def batch_down_ref():
         db_config = line.split(',')
     mysql = Mysql(db_config[0], db_config[1], db_config[2], db_config[3])
     mysql.connect()
-    select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical,id FROM reference_title  \
+    select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical,id,Symbol FROM reference_title  \
         WHERE HasFulltext = '%s' AND download = %d AND try_times =0 limit 1" % (True, 0)
     result = mysql.fetch_one(select_sql)
     while result:
@@ -213,6 +213,7 @@ def batch_down_ref():
         Title = result[1]
         paper_title = result[2]
         paper_id = result[3]
+        symbol = result[7]
         if '%' in Title:
             Title = Title.split('%')[0]
         dir_path = 'data/' + paper_title
@@ -225,6 +226,8 @@ def batch_down_ref():
             ref_type = 'degree'
         if result[5]:
             ref_type = 'perio'
+        if symbol == 'Conference':
+            ref_type = 'conference'
         update_sql = "UPDATE reference_title SET download = 1 WHERE id = '%d' AND download = 0" % (id)
         download_page_url = ref_download_page(ref_type, ArticaleId)
         try:
@@ -232,7 +235,8 @@ def batch_down_ref():
             mysql.update(update_sql)
         except BaseException as e:
             print Title + u"--------下载失败"
-            update_try_times = "UPDATE reference_title SET try_times = try_times+1  WHERE id = '%d' AND download = 0" % (id)
+            update_try_times = "UPDATE reference_title SET try_times = try_times+1  WHERE id = '%d' AND download = 0" % (
+            id)
             mysql.update(update_try_times)
             print e
         result = mysql.fetch_one(select_sql)
