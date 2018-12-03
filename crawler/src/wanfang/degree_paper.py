@@ -205,7 +205,7 @@ def batch_down_ref():
     mysql.connect()
     df_reference_title = pd.read_csv('test/reference_title.csv')
     select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical FROM reference_title  \
-        WHERE HasFulltext = '%s' AND download = %d AND try_times =0 limit 1" % (True, 1)
+        WHERE HasFulltext = '%s' AND download = %d AND try_times =0 limit 1" % (True, 0)
     result = mysql.fetch_one(select_sql)
     while result:
         ArticaleId = result[0]
