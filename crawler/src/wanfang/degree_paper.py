@@ -203,11 +203,11 @@ def batch_down_ref():
         db_config = line.split(',')
     mysql = Mysql(db_config[0], db_config[1], db_config[2], db_config[3])
     mysql.connect()
-    df_reference_title = pd.read_csv('test/reference_title.csv')
-    select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical FROM reference_title  \
+    select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical,id FROM reference_title  \
         WHERE HasFulltext = '%s' AND download = %d AND try_times =0 limit 1" % (True, 0)
     result = mysql.fetch_one(select_sql)
     while result:
+        id = result[6]
         ArticaleId = result[0]
         ArticaleId = ArticaleId[0:ArticaleId.index('^')] if '^' in ArticaleId else ArticaleId
         Title = result[1]
@@ -225,15 +225,14 @@ def batch_down_ref():
             ref_type = 'degree'
         if result[5]:
             ref_type = 'perio'
-        update_sql = "UPDATE reference_title SET download = 1 WHERE ArticaleId = '%s' AND download = 0" % (ArticaleId)
+        update_sql = "UPDATE reference_title SET download = 1 WHERE id = '%d' AND download = 0" % (id)
         download_page_url = ref_download_page(ref_type, ArticaleId)
         try:
             down_ref(download_page_url, save_path)
             mysql.update(update_sql)
         except BaseException as e:
             print Title + u"--------下载失败"
-            update_try_times = "UPDATE reference_title SET try_times = try_times+1  WHERE ArticaleId = '%s' AND download = 0" % (
-            ArticaleId)
+            update_try_times = "UPDATE reference_title SET try_times = try_times+1  WHERE id = '%d' AND download = 0" % (id)
             mysql.update(update_try_times)
             print e
         result = mysql.fetch_one(select_sql)
