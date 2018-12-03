@@ -221,6 +221,9 @@ def batch_down_ref():
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         save_path = dir_path + '/' + Title + '.pdf'
+        # 文件已存在，跳过下载
+        if os.path.exists(save_path):
+            continue
         ref_type = ""
         if result[4]:
             ref_type = 'degree'
