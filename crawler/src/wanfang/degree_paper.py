@@ -224,7 +224,7 @@ def batch_down_ref():
         save_path = dir_path + '/' + Title + '.pdf'
         # 文件已存在，跳过下载
         if os.path.exists(save_path):
-            update_down_sql = "update reference_title set download = 1 WHERE Title='%s'" % (old_Title)
+            update_down_sql = "update reference_title set download = 1 WHERE id='%d'" % (id)
             mysql.update(update_down_sql)
             print save_path + u" ======已存在"
             continue
