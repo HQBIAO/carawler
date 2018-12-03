@@ -181,6 +181,11 @@ class Mysql(object):
     def update(self, sql):
         self.insert(sql)
 
+    def fetch_one(self, sql):
+        self.cursor.execute(sql)
+        results = self.cursor.fetchone()
+        return results
+
 
 ''' from pdfminer.layout import LAParams
     from pdfminer.converter import PDFPageAggregator

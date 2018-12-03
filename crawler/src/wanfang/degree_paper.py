@@ -204,34 +204,33 @@ def batch_down_ref():
     mysql = Mysql(db_config[0], db_config[1], db_config[2], db_config[3])
     mysql.connect()
     df_reference_title = pd.read_csv('test/reference_title.csv')
-    for index, row in df_reference_title.iterrows():
-        HasFulltext = row['HasFulltext']
-        if not HasFulltext:
-            continue
-        ArticaleId = row['ArticaleId']
-        Title = row['Title']
-        paper_title = row['paper_title']
-        paper_id = row['paper_id']
-        if '%' in Title:
-            Title = Title.split('%')[0]
-        dir_path = 'data/' + paper_title
-        dir_path = os.path.abspath(dir_path)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-        save_path = dir_path + '/' + Title + '.pdf'
-        ref_type = ""
-        if not isinstance(row['Degree'], float):
-            ref_type = 'degree'
-        if not isinstance(row['Periodical'], float):
-            ref_type = 'perio'
-        update_sql = "UPDATE reference_title SET download = 1 WHERE ArticaleId = '%s'" % (ArticaleId)
-        download_page_url = ref_download_page(ref_type, ArticaleId)
-        try:
-            down_ref(download_page_url, save_path)
-            mysql.update(update_sql)
-        except BaseException as e:
-            print Title + "   下载失败"
-            print e
+    select_sql = "SELECT ArticaleId,Title,paper_title,paper_id,Degree,Periodical FROM reference_title  \
+        WHERE HasFulltext = '%s' AND download = %d limit 1" % (True, 1)
+    result = mysql.fetch_one(select_sql)
+    ArticaleId = result[0]
+    Title = result[1]
+    paper_title = result[2]
+    paper_id = result[3]
+    if '%' in Title:
+        Title = Title.split('%')[0]
+    dir_path = 'data/' + paper_title
+    dir_path = os.path.abspath(dir_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    save_path = dir_path + '/' + Title + '.pdf'
+    ref_type = ""
+    if result[4]:
+        ref_type = 'degree'
+    if result[5]:
+        ref_type = 'perio'
+    update_sql = "UPDATE reference_title SET download = 1 WHERE ArticaleId = '%s'" % (ArticaleId)
+    download_page_url = ref_download_page(ref_type, ArticaleId)
+    try:
+        down_ref(download_page_url, save_path)
+        mysql.update(update_sql)
+    except BaseException as e:
+        print Title + "   下载失败"
+        print e
 
 
 if __name__ == '__main__':

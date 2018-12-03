@@ -1,4 +1,5 @@
 import xlwt
+from ptyprocess.ptyprocess import FileNotFoundError
 
 book = xlwt.Workbook(encoding='utf-8')
 sheet = book.add_sheet("my_sheet")
