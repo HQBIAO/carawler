@@ -223,6 +223,7 @@ def batch_down_ref():
         save_path = dir_path + '/' + Title + '.pdf'
         # 文件已存在，跳过下载
         if os.path.exists(save_path):
+            print save_path+" ======已存在"
             continue
         ref_type = ""
         if result[4]:
