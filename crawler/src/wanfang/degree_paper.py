@@ -214,6 +214,7 @@ def batch_down_ref():
         paper_title = result[2]
         paper_id = result[3]
         symbol = result[7]
+        old_Title = Title
         if '%' in Title:
             Title = Title.split('%')[0]
         dir_path = 'data/' + paper_title
@@ -223,7 +224,9 @@ def batch_down_ref():
         save_path = dir_path + '/' + Title + '.pdf'
         # 文件已存在，跳过下载
         if os.path.exists(save_path):
-            print save_path+" ======已存在"
+            update_down_sql = "update reference_title set download = 1 WHERE Title='%s'" % (old_Title)
+            mysql.update(update_down_sql)
+            print save_path + u" ======已存在"
             continue
         ref_type = ""
         if result[4]:
@@ -240,7 +243,7 @@ def batch_down_ref():
         except BaseException as e:
             print Title + u"--------下载失败"
             update_try_times = "UPDATE reference_title SET try_times = try_times+1  WHERE id = '%d' AND download = 0" % (
-            id)
+                id)
             mysql.update(update_try_times)
             print e
         result = mysql.fetch_one(select_sql)
