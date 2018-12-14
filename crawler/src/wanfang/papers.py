@@ -20,6 +20,7 @@ def get_html(url):
         return r
     except Exception as e:
         print("has error:" + str(e))
+        return None
 
 
 def getNum(key):
@@ -199,4 +200,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    download_pdf('http://caj.d.cnki.net//KDoc/docdown/pubdownload.aspx?dk=kdoc%3apdfdown%3a9e2c4793049e788f23f219e024765c84','dd.pdf')
