@@ -25,7 +25,8 @@ class Mysql(object):
         try:
             self.cursor.execute(sql)
             self.db.commit()
-        except:
+        except BaseException as e:
+            print(e)
             self.db.rollback()
 
     def update(self, sql):

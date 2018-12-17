@@ -13,7 +13,8 @@ from crawler.src.wiki.utilAgent import choose_ua
 def get_html(url):
     try:
         header = {
-            'User-Agent': choose_ua(), }
+            'User-Agent': choose_ua(),
+            'Cookie': 'cnkiUserKey=00bc73d9-a156-e26e-77c3-42929cb28067; Ecp_ClientId=2180402145004264272; UM_distinctid=166ab1b02841b5-0d1dff9ad08ac4-346a7808-1fa400-166ab1b0285577; SID_search=201087; Ecp_session=1; ASP.NET_SessionId=3icyxccmo3ykdovyqbauqqns; SID_sug=111055; LID=WEEvREcwSlJHSldRa1FhdkJkVWEyd1JiUDgrRnBQUmNZcVI3d0V6YVBrMD0=$9A4hF_YAuvQ5obgVAqNKPCYcEjKensW4IQMovwHtwkF4VYPoHbKxJw!!; Ecp_LoginStuts=%7B%22IsAutoLogin%22%3Afalse%2C%22UserName%22%3A%22GDJNDX%22%2C%22ShowName%22%3A%22%25E6%259A%25A8%25E5%258D%2597%25E5%25A4%25A7%25E5%25AD%25A6%22%2C%22UserType%22%3A%22bk%22%2C%22r%22%3A%22CbxUQn%22%7D; c_m_LinID=LinID=WEEvREcwSlJHSldRa1FhdkJkVWEyd1JiUDgrRnBQUmNZcVI3d0V6YVBrMD0=$9A4hF_YAuvQ5obgVAqNKPCYcEjKensW4IQMovwHtwkF4VYPoHbKxJw!!&ot=12/14/2018 18:14:00; c_m_expire=2018-12-14 18:14:00'}
         r = requests.get(url, headers=header, verify=False)
         r.encoding = r.apparent_encoding
         # print(r.text)
@@ -200,4 +201,6 @@ def main():
 
 
 if __name__ == '__main__':
-    download_pdf('http://caj.d.cnki.net//KDoc/docdown/pubdownload.aspx?dk=kdoc%3apdfdown%3a9e2c4793049e788f23f219e024765c84','dd.pdf')
+    download_pdf(
+        'http://caj.d.cnki.net//KDoc/docdown/pubdownload.aspx?dk=kdoc%3apdfdown%3a9e2c4793049e788f23f219e024765c84',
+        'dd.pdf')
