@@ -1,11 +1,17 @@
 # coding=utf-8
 # date:下午3:46 
 # author:chenjunbiao
+import traceback
+
+import sys
 from bs4 import BeautifulSoup
 
 from crawler.src.wanfang.orm import Mysql
 from crawler.src.wanfang.papers import get_html, download_pdf
 from pathlib import Path
+import logging
+
+logging.basicConfig(filename="cnki.log", level=logging.DEBUG)
 
 
 def down_page(url):
@@ -43,7 +49,7 @@ def main():
         cnki = row[1]
         paper_title = row[2]
         title = row[3]
-
+    try:
         url1 = down_page(cnki)
         # url2 = resource_page(url1)
         # url3 = download_link(url2)
@@ -55,6 +61,11 @@ def main():
         download_pdf(url1, str(save_path))
         update_sql = "update new_C_D_reference_formatted set get_from_cnki = 1 where id =%d" % (id)
         mysql.update(update_sql)
+        logging.debug(paper_title + "-------" + title + ":下载成功")
+    except Exception as e:
+        logging.debug(paper_title + "-------" + title + ":下载是失败")
+        t, v, tb = sys.exc_info()
+        logging.debug(traceback.format_exception(t, v, tb))
 
 
 if __name__ == '__main__':
