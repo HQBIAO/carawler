@@ -2,22 +2,27 @@
 # date:下午3:46 
 # author:chenjunbiao
 import traceback
-
 import sys
-from datetime import datetime
-
-import requests
-from bs4 import BeautifulSoup
-
-from crawler.src.wanfang.orm import Mysql
-from crawler.src.wanfang.papers import download_pdf
-from pathlib import Path
 import logging
-
+import requests
+import threading
+from datetime import datetime
+from bs4 import BeautifulSoup
+from crawler.src.wanfang.orm import Mysql
+from pathlib import Path
 from crawler.src.wiki.utilAgent import choose_ua
 
 logging.basicConfig(filename="cnki.log", level=logging.DEBUG)
 
+
+class DownCnkiThread(threading.Thread):
+    def __init__(self, thread_id):
+        self.thread_id = thread_id
+
+    def run(self):
+        logging.debug("Starting " + self.name)
+        main(self.thread_id)
+        logging.debug("Existing " + self.name)
 
 class Cnki():
     def __init__(self, cookie="", ua=choose_ua()):
@@ -38,6 +43,8 @@ class Cnki():
         res = requests.get('http://login.cnki.net/', headers=header)
         self.cookie = res.request.headers['Cookie']
         self.ua = header['User-Agent']
+        logging.debug('刷新cookie成功')
+        logging.debug(self.cookie)
 
     def get_html(self, url):
         try:
@@ -100,9 +107,9 @@ def get_c_m_expire(cookie):
 #     return resource_page(url)
 
 
-def main():
+def main(t_id):
     mysql = Mysql.get_connection_instance(r'/Users/chenjunbiao/project/carawler/crawler/src/wanfang/db_config.txt')
-    sql = "select id ,cnki,paper_title,title from new_C_D_reference_formatted where cnki LIKE '%cnki%' AND get_from_cnki =0"
+    sql = "select id ,cnki,paper_title,title from new_C_D_reference_formatted where id%5="+str(t_id)+" AND get_from_cnki =0 AND  cnki LIKE '%cnki%'"
     result = mysql.fetch_all(sql)
     cookie = 'Ecp_ClientId=4181112101800794072; cnkiUserKey\
     =80fd7e89-b248-38b3-fd19-00f0564e61bd; UM_distinctid=16705b7108be39-01f38d4e5a6a2e-594d2a16-1fa400-16705b7108c8b3'
@@ -138,4 +145,13 @@ if __name__ == '__main__':
     # else:
     #     type = 'caj'
     # download_pdf(url3, "")
-    main()
+    t0 = DownCnkiThread(0)
+    t1 = DownCnkiThread(1)
+    t2 = DownCnkiThread(2)
+    t3 = DownCnkiThread(3)
+    t4 = DownCnkiThread(4)
+    t0.start()
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
