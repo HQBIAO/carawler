@@ -15,18 +15,6 @@ def get_paper_type_map():
     return paper_type_map
 
 
-def group_paper(paper_dir, title_type_map):
-    paper_path = Path(paper_dir)
-    for a in paper_path.iterdir():
-        if not a.is_dir():
-            continue
-        print('========================')
-        for b in a.iterdir():
-            # if not b.is_dir():
-            #     continue
-            print(b.stem)
-
-
 if __name__ == '__main__':
     paper_type_map = get_paper_type_map()
     d_path = Path.home().joinpath('d_ref')
@@ -41,6 +29,8 @@ if __name__ == '__main__':
 
     paper_path = Path.home().joinpath('cnki')
     for a in paper_path.iterdir():
+        if a.stem == '.DS_Store':
+            continue
         d_paper_path = d_path.joinpath(a.stem)
         c_paper_path = c_path.joinpath(a.stem)
         j_paper_path = j_path.joinpath(a.stem)
@@ -55,8 +45,8 @@ if __name__ == '__main__':
             print(b.stem)
             paper_type = paper_type_map[b.stem]
             if paper_type == 'D':
-                shutil.move(str(b), str(d_paper_path))
+                shutil.copy(str(b), str(d_paper_path))
             if paper_type == 'C':
-                shutil.move(str(b), str(c_paper_path))
+                shutil.copy(str(b), str(c_paper_path))
             if paper_type == 'J':
-                shutil.move(str(b), str(j_paper_path))
+                shutil.copy(str(b), str(j_paper_path))
