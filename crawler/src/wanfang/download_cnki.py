@@ -110,7 +110,7 @@ def get_c_m_expire(cookie):
 
 def main(t_id):
     mysql = Mysql.get_connection_instance(r'/Users/chenjunbiao/project/carawler/crawler/src/wanfang/db_config.txt')
-    sql = "select id ,cnki,paper_title,title from new_C_D_reference_formatted where id%5="+str(t_id)+" AND get_from_cnki =0 AND  cnki LIKE '%cnki%'"
+    sql = "select id ,cnki,paper_title,title from new_C_D_reference_formatted where id%10="+str(t_id)+" AND get_from_cnki =0 AND  cnki LIKE '%cnki%'"
     result = mysql.fetch_all(sql)
     cookie = 'Ecp_ClientId=4181112101800794072; cnkiUserKey\
     =80fd7e89-b248-38b3-fd19-00f0564e61bd; UM_distinctid=16705b7108be39-01f38d4e5a6a2e-594d2a16-1fa400-16705b7108c8b3'
@@ -146,13 +146,20 @@ if __name__ == '__main__':
     # else:
     #     type = 'caj'
     # download_pdf(url3, "")
-    t0 = DownCnkiThread(0)
-    t1 = DownCnkiThread(1)
-    t2 = DownCnkiThread(2)
-    t3 = DownCnkiThread(3)
-    t4 = DownCnkiThread(4)
-    t0.start()
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
+    for i in range(10):
+        DownCnkiThread(i).start()
+    # t0 = DownCnkiThread(0)
+    # t1 = DownCnkiThread(1)
+    # t2 = DownCnkiThread(2)
+    # t3 = DownCnkiThread(3)
+    # t4 = DownCnkiThread(4)
+    # t5 = DownCnkiThread(5)
+    # t6 = DownCnkiThread(6)
+    # t7 = DownCnkiThread(7)
+    # t8 = DownCnkiThread(8)
+    # t9 = DownCnkiThread(9)
+    # t0.start()
+    # t1.start()
+    # t2.start()
+    # t3.start()
+    # t4.start()
