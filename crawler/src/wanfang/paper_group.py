@@ -27,7 +27,7 @@ if __name__ == '__main__':
     if not j_path.exists():
         j_path.mkdir()
 
-    paper_path = Path.home().joinpath('cnki')
+    paper_path = Path.home().joinpath('cnki_copy')
     for a in paper_path.iterdir():
         if a.stem == '.DS_Store':
             continue
@@ -42,11 +42,14 @@ if __name__ == '__main__':
             j_paper_path.mkdir()
 
         for b in a.iterdir():
-            print(b.stem)
-            paper_type = paper_type_map[b.stem]
-            if paper_type == 'D':
-                shutil.copy(str(b), str(d_paper_path))
-            if paper_type == 'C':
-                shutil.copy(str(b), str(c_paper_path))
-            if paper_type == 'J':
-                shutil.copy(str(b), str(j_paper_path))
+            try:
+                paper_type = paper_type_map[b.stem]
+                if paper_type == 'D':
+                    shutil.move(str(b), str(d_paper_path))
+                if paper_type == 'C':
+                    shutil.move(str(b), str(c_paper_path))
+                if paper_type == 'J':
+                    shutil.move(str(b), str(j_paper_path))
+            except Exception as e:
+                print(str(b))
+                print(e)
