@@ -22,14 +22,14 @@ def filter_file_by_size(ref_type):
     return name_list
 
 
-if __name__ == '__main__':
-    name_list = []
-    name_list.extend(filter_file_by_size('j_ref'))
-    name_list.extend(filter_file_by_size('d_ref'))
-    name_list.extend(filter_file_by_size('c_ref'))
-    paper_title_list = [name[0] for name in name_list]
-    title_list = [name[1] for name in name_list]
-    size_list = [name[2] for name in name_list]
+def get_error_file():
+    _list = []
+    _list.extend(filter_file_by_size('j_ref'))
+    _list.extend(filter_file_by_size('d_ref'))
+    _list.extend(filter_file_by_size('c_ref'))
+    paper_title_list = [name[0] for name in _list]
+    title_list = [name[1] for name in _list]
+    size_list = [name[2] for name in _list]
     pd.DataFrame({'paper_title': paper_title_list, 'title': title_list, 'size_kb': size_list}).to_csv(
         '../error_files.csv', index=False)
     # with open('../error_files.txt','w') as f:
@@ -38,3 +38,10 @@ if __name__ == '__main__':
     # this can work too
     # files = glob.glob(str(Path.home().joinpath('j_ref')) + '/**/*.caj', recursive=True)
     # print(files)
+
+
+if __name__ == '__main__':
+    p = str(Path.cwd().joinpath('《全漢志傳》雙音動詞研究-------《<後漢書>雙音動詞研究》.caj'))
+    # p = str(Path.cwd().joinpath('dd.caj'))
+    with open(p,'wb') as f:
+        f.write('fdkjfjk'.encode('utf-8'))
