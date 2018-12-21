@@ -6,10 +6,11 @@ import sys
 import logging
 import requests
 import threading
+sys.path.append('/home/zengchuan/carawler/')
 from datetime import datetime
+from pathlib import Path
 from bs4 import BeautifulSoup
 from crawler.src.wanfang.orm import Mysql
-from pathlib import Path
 from crawler.src.wiki.utilAgent import choose_ua
 
 logging.basicConfig(filename="cnki.log", level=logging.DEBUG)
