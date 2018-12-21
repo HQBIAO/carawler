@@ -51,8 +51,8 @@ class Cnki():
 
     def get_html(self, url):
         try:
-            expire_time = get_c_m_expire(self.cookie)
             now = datetime.now()
+            expire_time = get_c_m_expire(self.cookie)
             d = (expire_time - now).seconds
             if d < 60:  # cookie过期时间小于60秒，重新登录，刷新cookie
                 self.login(url)
