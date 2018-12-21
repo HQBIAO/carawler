@@ -25,6 +25,7 @@ class DownCnkiThread(threading.Thread):
         main(self.thread_id)
         logging.debug("Existing " + self.name)
 
+
 class Cnki():
     def __init__(self, cookie="", ua=choose_ua()):
         self.cookie = cookie
