@@ -32,7 +32,7 @@ def get_error_file():
     title_list = [name[1] for name in _list]
     size_list = [name[2] for name in _list]
     pd.DataFrame({'paper_title': paper_title_list, 'title': title_list, 'size_kb': size_list}).to_csv(
-        '../error_files.csv', index=False)
+        '/error_files.csv', index=False)
     # with open('../error_files.txt','w') as f:
     #     for name in name_list:
     #         f.write(name[0]+'\t'+name[1]+'\t'+name[2]+'\n')
@@ -42,7 +42,10 @@ def get_error_file():
 
 
 if __name__ == '__main__':
+    get_error_file()
+    """
     p = str(Path.cwd().joinpath('《全漢志傳》雙音動詞研究-------《<後漢書>雙音動詞研究》.caj'))
     # p = str(Path.cwd().joinpath('dd.caj'))
     with open(p,'wb') as f:
         f.write('fdkjfjk'.encode('utf-8'))
+"""
