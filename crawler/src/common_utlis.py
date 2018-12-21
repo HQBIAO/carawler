@@ -24,9 +24,10 @@ def filter_file_by_size(ref_type):
 
 def get_error_file():
     _list = []
-    _list.extend(filter_file_by_size('j_ref'))
-    _list.extend(filter_file_by_size('d_ref'))
-    _list.extend(filter_file_by_size('c_ref'))
+    _list.extend(filter_file_by_size('cnki'))
+    # _list.extend(filter_file_by_size('j_ref'))
+    # _list.extend(filter_file_by_size('d_ref'))
+    # _list.extend(filter_file_by_size('c_ref'))
     paper_title_list = [name[0] for name in _list]
     title_list = [name[1] for name in _list]
     size_list = [name[2] for name in _list]
