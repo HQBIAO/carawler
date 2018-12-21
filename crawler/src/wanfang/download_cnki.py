@@ -111,7 +111,7 @@ def get_c_m_expire(cookie):
 
 
 def main(t_id):
-    mysql = Mysql.get_connection_instance(r'/Users/chenjunbiao/project/carawler/crawler/src/wanfang/db_config.txt')
+    mysql = Mysql.get_connection_instance(r'db_config.txt')
     sql = "select id ,cnki,paper_title,title from new_C_D_reference_formatted where id%10="+str(t_id)+" AND get_from_cnki =0 AND  cnki LIKE '%cnki%'"
     result = mysql.fetch_all(sql)
     cookie = 'Ecp_ClientId=4181112101800794072; cnkiUserKey\
