@@ -5,6 +5,7 @@ import glob
 import re
 from pathlib import Path
 import pandas as pd
+import shutil
 
 
 def filter_chi_char(s):
@@ -41,11 +42,39 @@ def get_error_file():
     # print(files)
 
 
+def get_papers_has_ref():
+    papers = pd.read_csv('/Users/chenjunbiao/project/graduation_project/paper_degree_paper_with_reference.csv')
+    paper_list = list(papers['paper_title'])
+    for pdf in Path('/Users/chenjunbiao/project/graduation_project/data1').rglob("*.pdf"):
+        if pdf.stem in paper_list:
+            try:
+                shutil.move(str(pdf), '/Users/chenjunbiao/project/graduation_project/degree_paper')
+            except:
+                pass
+
+
+def batch_create_txt():
+    for pdf in Path('/Users/chenjunbiao/project/graduation_project/degree_paper').rglob("*.pdf"):
+        with open('/Users/chenjunbiao/project/graduation_project/degree_paper_survey/' + pdf.stem + '.txt', 'w') as f:
+            f.write('')
+
+
+def get_downloaded_list():
+    name_list = []
+    result = list(Path.home().joinpath('cnki').rglob("*.caj"))
+    for r in result:
+        name_list.append((r.parent.name, r.stem, r.stat().st_size / 1024))
+    pd.DataFrame(columns={'paper_title', 'title', 'size'}, data=name_list).to_csv('downloaded_files.csv', index=False)
+
+
 if __name__ == '__main__':
-    get_error_file()
+    # get_error_file()
     """
     p = str(Path.cwd().joinpath('《全漢志傳》雙音動詞研究-------《<後漢書>雙音動詞研究》.caj'))
     # p = str(Path.cwd().joinpath('dd.caj'))
     with open(p,'wb') as f:
         f.write('fdkjfjk'.encode('utf-8'))
 """
+    # get_papers_has_ref()
+    # batch_create_txt()
+    get_downloaded_list()
