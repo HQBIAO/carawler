@@ -21,9 +21,10 @@ logging.basicConfig(filename="cnki.log", level=logging.DEBUG)
 
 
 class DownCnkiThread(threading.Thread):
-    def __init__(self, thread_id):
+    def __init__(self, thread_id,ref_down_df=None):
         threading.Thread.__init__(self)
         self.thread_id = thread_id
+        self.ref_down_df = ref_down_df
 
     # def run(self):
     #     logging.debug("Starting " + self.name)
@@ -278,4 +279,4 @@ def down_caj(ref_down_df, t_id):
 
 if __name__ == '__main__':
     for i in range(10):
-        DownCnkiThread(i).start()
+        DownCnkiThread(i,pd.read_csv('down_df.csv')).start()
