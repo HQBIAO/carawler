@@ -246,14 +246,15 @@ def main(t_id):
 
 
 def down_caj(ref_down_df, t_id):
-    a = ref_down_df[ref_down_df.index.values % 10 == t_id]
-    a = a[a['CurDBCode'] == 'CJFQ']
+    b = ref_down_df[ref_down_df.index.values % 10 == t_id]
+    a = b[b['CurDBCode'] == 'CJFQ']
+    print(a.head(5))
     file_download_status_df = pd.DataFrame(columns=['uuid', 'title', 'success'])
     cnki = Cnki()
     for index, row in a.iterrows():
         down_link = row['down_link']
         # 下载链接不存在
-        if down_link.startswith('http'):
+        if not down_link.startswith('http'):
             file_download_status_df = file_download_status_df.append(
                 {'uuid': row['uuid'], 'title': row['ref_title'], 'success': 'download link not found'},
                 ignore_index=True)
@@ -261,6 +262,7 @@ def down_caj(ref_down_df, t_id):
         save_path = Path.home().joinpath('finance', row['target_paper'])
         if not save_path.exists():
             save_path.mkdir(parents=True)
+        print(row['ref_title'],row['uuid'],type(row['ref_title']),type(row['uuid']))
         save_path = save_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
         try:
             cnki.download_caj(down_link, str(save_path))
@@ -279,5 +281,6 @@ def down_caj(ref_down_df, t_id):
 
 
 if __name__ == '__main__':
+    # down_caj(pd.read_csv('down_df.csv'),1)
     for i in range(10):
         DownCnkiThread(i, pd.read_csv('down_df.csv')).start()
