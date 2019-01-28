@@ -21,7 +21,7 @@ logging.basicConfig(filename="cnki.log", level=logging.DEBUG)
 
 
 class DownCnkiThread(threading.Thread):
-    def __init__(self, thread_id,ref_down_df=None):
+    def __init__(self, thread_id, ref_down_df=None):
         threading.Thread.__init__(self)
         self.thread_id = thread_id
         self.ref_down_df = ref_down_df
@@ -33,7 +33,7 @@ class DownCnkiThread(threading.Thread):
 
     def run(self):
         logging.debug("Starting " + self.name)
-        down_caj(self.thread_id)
+        down_caj(self.ref_down_df, self.thread_id)
         logging.debug("Existing " + self.name)
 
 
@@ -255,7 +255,8 @@ def down_caj(ref_down_df, t_id):
         # 下载链接不存在
         if down_link.startswith('http'):
             file_download_status_df = file_download_status_df.append(
-                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': 'download link not found'})
+                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': 'download link not found'},
+                ignore_index=True)
             continue
         save_path = Path.home().joinpath('finance', row['target_paper'])
         if not save_path.exists():
@@ -264,11 +265,11 @@ def down_caj(ref_down_df, t_id):
         try:
             cnki.download_caj(down_link, str(save_path))
             file_download_status_df = file_download_status_df.append(
-                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '1'})
+                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '1'}, ignore_index=True)
             logging.debug(row['target_paper'] + "-------" + row['ref_title'] + ":下载成功")
         except Exception as e:
             file_download_status_df = file_download_status_df.append(
-                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '0'})
+                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '0'}, ignore_index=True)
             logging.debug(row['target_paper'] + "-------" + row['ref_title'] + ":下载失败")
             logging.debug(e)
     result_path = Path.cwd().parent.joinpath('data')
@@ -279,4 +280,4 @@ def down_caj(ref_down_df, t_id):
 
 if __name__ == '__main__':
     for i in range(10):
-        DownCnkiThread(i,pd.read_csv('down_df.csv')).start()
+        DownCnkiThread(i, pd.read_csv('down_df.csv')).start()
