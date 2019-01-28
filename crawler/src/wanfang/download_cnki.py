@@ -4,14 +4,18 @@
 import traceback
 import sys
 import logging
+
+import math
 import requests
 import threading
+
 sys.path.append('/home/zengchuan/carawler/')
 from datetime import datetime
 from pathlib import Path
 from bs4 import BeautifulSoup
 from crawler.src.wanfang.orm import Mysql
 from crawler.src.wiki.utilAgent import choose_ua
+import pandas as pd
 
 logging.basicConfig(filename="cnki.log", level=logging.DEBUG)
 
@@ -21,9 +25,14 @@ class DownCnkiThread(threading.Thread):
         threading.Thread.__init__(self)
         self.thread_id = thread_id
 
+    # def run(self):
+    #     logging.debug("Starting " + self.name)
+    #     main(self.thread_id)
+    #     logging.debug("Existing " + self.name)
+
     def run(self):
         logging.debug("Starting " + self.name)
-        main(self.thread_id)
+        down_caj(self.thread_id)
         logging.debug("Existing " + self.name)
 
 
@@ -95,24 +104,120 @@ def get_c_m_expire(cookie):
     return datetime.strptime(s.split('=')[1], "%Y-%m-%d %H:%M:%S")
 
 
-#
-# def resource_page(url):
-#     html = get_html(url)
-#     if not html:  # http请求失败
-#         raise ConnectionError(url + '   请求失败')
-#     bs = BeautifulSoup(html.text, 'html.parser')
-#     a_tag = bs.select('a')[0]
-#     link = a_tag['href']
-#     return link
-#
-#
-# def download_link(url):
-#     return resource_page(url)
+def filter_essayBoxList(essayBoxList):
+    box_list = []
+    for essayBox in essayBoxList:
+        db_title_text = essayBox.select('.dbTitle')[0].text
+        if '中国学术期刊网络出版总库' in db_title_text or '国际期刊数据库' in db_title_text:
+            box_list.append(essayBox)
+    return box_list
+
+
+def __get_ref_items(essayBoxList, CurDBCode='CJFQ', target_paper=""):
+    db_title = 'not found'
+    if CurDBCode == 'CJFQ':
+        db_title = '中国学术期刊网络出版总库'
+    if CurDBCode == 'CRLDENG':
+        db_title = '外文题录数据库'
+    if CurDBCode == 'SSJD':
+        db_title = '国际期刊数据库'
+    ref_items = []
+    for essayBox in essayBoxList:
+        if db_title in essayBox.select('.dbTitle')[0].text:
+            ref_items = essayBox.find('ul').findAll('li')
+            break
+    ref_items_info = []
+
+    for item in ref_items:
+        text = item.text
+        a_tag = item.find('a')
+        ref_href = a_tag['href'] if a_tag else None
+        ref_title = a_tag.text if a_tag else None
+        ref_items_info.append(
+            {'target_paper': target_paper,
+             'ref_href': ref_href,
+             'ref_title': ref_title,
+             'text': text,
+             'CurDBCode': CurDBCode
+             })
+    return ref_items_info
+
+
+def html_bs(url):
+    res = requests.get(url)
+    res.encoding = 'utf-8'
+    html = res.text
+    return BeautifulSoup(html, 'html.parser')
+
+
+def get_ref_list(detail_url, target_paper):
+    """
+    获取文章的参考文献列表（不需要登录）
+    :param detail_url: 文章详情页url
+    :return:
+    """
+    ref_list = []
+    query_str = detail_url.split('?')[1]
+    param_dict = {}
+    for param in query_str.split('&'):
+        param_pair = param.split('=')
+        param_dict[param_pair[0]] = param_pair[1]
+
+    url_pattern = 'http://kns.cnki.net/kcms/detail/frame/list.aspx?dbcode={}&filename={}&dbname={}\
+    &RefType=1&page={}&CurDBCode={}'
+    ref_url = url_pattern.format(
+        param_dict['dbcode'], param_dict['filename'], param_dict['dbname'], '1', 'CJFQ')
+    bs = html_bs(ref_url)
+
+    essayBoxList = bs.select('.essayBox')
+    essayBoxList = filter_essayBoxList(essayBoxList)
+
+    china_journal = __get_ref_items(essayBoxList, CurDBCode='CJFQ', target_paper=target_paper)
+    international_journal = __get_ref_items(essayBoxList, CurDBCode='SSJD', target_paper=target_paper)
+    ref_list.extend(china_journal)
+    ref_list.extend(international_journal)
+    for essayBox in essayBoxList:
+        # if '中国学术期刊网络出版总库' not in essayBox.select('.dbTitle')[0].text:
+        #     continue
+        # ref_items = essayBox.find('ul').findAll('li')
+        # ref_items_info = __get_ref_items(ref_items)
+        # print(ref_items_info)  # 分页导航栏
+        page_bar = essayBox.select('.pageBar')
+        if page_bar:
+            CurDBCode = page_bar[0].find('span')['id']
+            total_cnt = int(essayBox.find('span', {'name': 'pcount'}).text)
+            page_cnt = int(math.ceil(total_cnt / 10))
+            page_link_list = []
+            for page_no in range(2, page_cnt + 1):
+                page_link_list.append(url_pattern.format(
+                    param_dict['dbcode'], param_dict['filename'], param_dict['dbname'], str(page_no), CurDBCode))
+            for page_link in page_link_list:
+                page_bs = html_bs(page_link)
+                page_items = __get_ref_items(page_bs.select('.essayBox'), CurDBCode=CurDBCode,
+                                             target_paper=target_paper)
+                ref_list.extend(page_items)
+    return ref_list
+
+
+def get_down_url(detail_page_url, CurDBCode, domain='http://kns.cnki.net'):
+    if not detail_page_url or isinstance(detail_page_url, float):
+        return 'detail url not exist'
+    bs = html_bs(domain + detail_page_url)
+    if CurDBCode == 'CJFQ':
+        down_btn = bs.select('#cajDown')
+        down_btn = down_btn[0] if down_btn else None
+        down_url = down_btn['href'] if down_btn else 'caj link not exist'
+    else:
+        down_btn = bs.select('#DownLoadParts')
+        down_btn = down_btn[0] if down_btn else None
+        down_url = down_btn.find('a')['href'] if down_btn else 'down link not exist'
+    return down_url
 
 
 def main(t_id):
     mysql = Mysql.get_connection_instance(r'db_config.txt')
-    sql = "select id ,cnki,paper_title,title from new_C_D_reference_formatted where id%10="+str(t_id)+" AND get_from_cnki =0 AND  cnki LIKE '%cnki%'"
+    sql = "SELECT id ,cnki,paper_title,title FROM new_C_D_reference_formatted WHERE id%10=" + str(
+        t_id) + " AND get_from_cnki =0 AND  cnki LIKE '%cnki%'"
     result = mysql.fetch_all(sql)
     cookie = 'Ecp_ClientId=4181112101800794072; cnkiUserKey\
     =80fd7e89-b248-38b3-fd19-00f0564e61bd; UM_distinctid=16705b7108be39-01f38d4e5a6a2e-594d2a16-1fa400-16705b7108c8b3'
@@ -139,29 +244,38 @@ def main(t_id):
             logging.debug(traceback.format_exception(t, v, tb))
 
 
+def down_caj(ref_down_df, t_id):
+    a = ref_down_df[ref_down_df.index.values % 10 == t_id]
+    a = a[a['CurDBCode'] == 'CJFQ']
+    file_download_status_df = pd.DataFrame(columns=['uuid', 'title', 'success'])
+    cnki = Cnki()
+    for index, row in a.iterrows():
+        down_link = row['down_link']
+        # 下载链接不存在
+        if down_link.startswith('http'):
+            file_download_status_df = file_download_status_df.append(
+                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': 'download link not found'})
+            continue
+        save_path = Path.home().joinpath('finance', row['target_paper'])
+        if not save_path.exists():
+            save_path.mkdir(parents=True)
+        save_path = save_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
+        try:
+            cnki.download_caj(down_link, str(save_path))
+            file_download_status_df = file_download_status_df.append(
+                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '1'})
+            logging.debug(row['target_paper'] + "-------" + row['ref_title'] + ":下载成功")
+        except Exception as e:
+            file_download_status_df = file_download_status_df.append(
+                {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '0'})
+            logging.debug(row['target_paper'] + "-------" + row['ref_title'] + ":下载失败")
+            logging.debug(e)
+    result_path = Path.cwd().parent.joinpath('data')
+    if not result_path.exists():
+        result_path.mkdir(parents=True)
+    file_download_status_df.to_csv(str(result_path.joinpath('file_download_status_' + str(t_id) + '.csv')), index=False)
+
+
 if __name__ == '__main__':
-    # url1 = down_page('http://www.cnki.com.cn/Article/CJFDTotal-GWJX200802006.htm')
-    # url2 = resource_page(url1)
-    # url3 = download_link(url2)
-    # if url1.contains('pdfdown'):
-    #     type = 'pdf'
-    # else:
-    #     type = 'caj'
-    # download_pdf(url3, "")
     for i in range(10):
         DownCnkiThread(i).start()
-    # t0 = DownCnkiThread(0)
-    # t1 = DownCnkiThread(1)
-    # t2 = DownCnkiThread(2)
-    # t3 = DownCnkiThread(3)
-    # t4 = DownCnkiThread(4)
-    # t5 = DownCnkiThread(5)
-    # t6 = DownCnkiThread(6)
-    # t7 = DownCnkiThread(7)
-    # t8 = DownCnkiThread(8)
-    # t9 = DownCnkiThread(9)
-    # t0.start()
-    # t1.start()
-    # t2.start()
-    # t3.start()
-    # t4.start()
