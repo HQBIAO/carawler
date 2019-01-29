@@ -1,6 +1,7 @@
 # coding=utf-8
 # date:下午3:46 
 # author:chenjunbiao
+import random
 import traceback
 import sys
 import logging
@@ -10,7 +11,7 @@ import requests
 import threading
 
 sys.path.append('/home/zengchuan/carawler/')
-from datetime import datetime
+from datetime import datetime, time
 from pathlib import Path
 from bs4 import BeautifulSoup
 from crawler.src.wanfang.orm import Mysql
@@ -248,7 +249,6 @@ def main(t_id):
 def down_caj(ref_down_df, t_id):
     b = ref_down_df[ref_down_df.index.values % 10 == t_id]
     a = b[b['CurDBCode'] == 'CJFQ']
-    print(a.head(5))
     file_download_status_df = pd.DataFrame(columns=['uuid', 'title', 'success'])
     cnki = Cnki()
     for index, row in a.iterrows():
@@ -262,9 +262,12 @@ def down_caj(ref_down_df, t_id):
         save_path = Path.home().joinpath('finance', row['target_paper'])
         if not save_path.exists():
             save_path.mkdir(parents=True)
-        print(row['ref_title'],row['uuid'],type(row['ref_title']),type(row['uuid']))
+        print(row['ref_title'], row['uuid'], type(row['ref_title']), type(row['uuid']))
         save_path = save_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
         try:
+            html_bs('http://kns.cnki.net'+row['ref_href'])
+            sleep_time = random.randint(1, 15)
+            time.sleep(sleep_time)
             cnki.download_caj(down_link, str(save_path))
             file_download_status_df = file_download_status_df.append(
                 {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '1'}, ignore_index=True)
