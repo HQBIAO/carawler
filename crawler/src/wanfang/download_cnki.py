@@ -51,10 +51,11 @@ class Cnki():
         """
         header = {
             # 'Cookie': 'Ecp_ClientId=4181112101800794072; cnkiUserKey=80fd7e89-b248-38b3-fd19-00f0564e61bd; UM_distinctid=16705b7108be39-01f38d4e5a6a2e-594d2a16-1fa400-16705b7108c8b3',
+            'Cookie': 'Ecp_ClientId=4181112101800794072; cnkiUserKey=80fd7e89-b248-38b3-fd19-00f0564e61bd; UM_distinctid=16705b7108be39-01f38d4e5a6a2e-594d2a16-1fa400-16705b7108c8b3; ASP.NET_SessionId=wd15g34uribppeli2pnd3r3n; SID=020123; Ecp_lout=1; LID=',
             'Refer': refer,
             'User-Agent': choose_ua()
         }
-        res = requests.get('http://login.cnki.net/', headers=header)
+        res = requests.get('http://login.cnki.net/TopLogin/api/loginapi/IpLogin?callback=jQuery111302840630089720011_1548743652409&isAutoLogin=false&checkCode=&isForceLogin=true&_=1548743652412', headers=header)
         self.cookie = res.request.headers['Cookie']
         self.ua = header['User-Agent']
         logging.debug('刷新cookie成功')
