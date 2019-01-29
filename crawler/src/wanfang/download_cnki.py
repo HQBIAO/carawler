@@ -10,6 +10,7 @@ import math
 import requests
 import threading
 import time
+
 sys.path.append('/home/zengchuan/carawler/')
 from datetime import datetime
 from pathlib import Path
@@ -55,7 +56,9 @@ class Cnki():
             'Refer': refer,
             'User-Agent': choose_ua()
         }
-        res = requests.get('http://login.cnki.net/TopLogin/api/loginapi/IpLogin?callback=jQuery111302840630089720011_1548743652409&isAutoLogin=false&checkCode=&isForceLogin=true&_=1548743652412', headers=header)
+        res = requests.get(
+            'http://login.cnki.net/TopLogin/api/loginapi/IpLogin?callback=jQuery111302840630089720011_1548743652409&isAutoLogin=false&checkCode=&isForceLogin=true&_=1548743652412',
+            headers=header)
         self.cookie = res.request.headers['Cookie']
         self.ua = header['User-Agent']
         logging.debug('刷新cookie成功')
@@ -253,7 +256,8 @@ def down_caj(ref_down_df, t_id):
     file_download_status_df = pd.DataFrame(columns=['uuid', 'title', 'success'])
     cnki = Cnki()
     for index, row in a.iterrows():
-        down_link = row['down_link']
+        down_link = get_down_url(row['ref_href'], CurDBCode='CJFQ')
+        # down_link = row['down_link']
         # 下载链接不存在
         if not down_link.startswith('http'):
             file_download_status_df = file_download_status_df.append(
@@ -266,7 +270,7 @@ def down_caj(ref_down_df, t_id):
         print(row['ref_title'], row['uuid'], type(row['ref_title']), type(row['uuid']))
         save_path = save_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
         try:
-            cnki.get_html('http://kns.cnki.net'+row['ref_href'])
+            cnki.get_html('http://kns.cnki.net' + row['ref_href'])
             sleep_time = random.randint(1, 15)
             time.sleep(sleep_time)
             cnki.download_caj(down_link, str(save_path))
