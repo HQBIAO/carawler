@@ -59,7 +59,10 @@ class Cnki():
         res = requests.get(
             'http://login.cnki.net/TopLogin/api/loginapi/IpLogin?callback=jQuery111302840630089720011_1548743652409&isAutoLogin=false&checkCode=&isForceLogin=true&_=1548743652412',
             headers=header)
-        self.cookie = res.request.headers['Cookie']
+        cookie_str = ""
+        for c in res.cookies:
+            cookie_str += c.name + '=' + c.value + ';'
+        self.cookie = cookie_str
         self.ua = header['User-Agent']
         logging.debug('刷新cookie成功')
         logging.debug(self.cookie)
@@ -264,16 +267,19 @@ def down_caj(ref_down_df, t_id):
                 {'uuid': row['uuid'], 'title': row['ref_title'], 'success': 'download link not found'},
                 ignore_index=True)
             continue
-        save_path = Path.home().joinpath('finance', row['target_paper'])
-        if not save_path.exists():
-            save_path.mkdir(parents=True)
-        print(row['ref_title'], row['uuid'], type(row['ref_title']), type(row['uuid']))
-        save_path = save_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
+        save_dir_path = Path.home().joinpath('finance', row['target_paper'])
+        if not save_dir_path.exists():
+            save_dir_path.mkdir(parents=True)
+        save_file_path = save_dir_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
+        if save_file_path.exists():
+            print(str(save_file_path)+' already exist')
+            continue
         try:
-            cnki.get_html('http://kns.cnki.net' + row['ref_href'])
+            # cnki.get_html('http://kns.cnki.net' + row['ref_href'])
+            print('begin downloading '+str(save_file_path))
             sleep_time = random.randint(1, 15)
             time.sleep(sleep_time)
-            cnki.download_caj(down_link, str(save_path))
+            cnki.download_caj(down_link, str(save_file_path))
             file_download_status_df = file_download_status_df.append(
                 {'uuid': row['uuid'], 'title': row['ref_title'], 'success': '1'}, ignore_index=True)
             logging.debug(row['target_paper'] + "-------" + row['ref_title'] + ":下载成功")
