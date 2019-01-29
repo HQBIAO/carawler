@@ -54,8 +54,10 @@ def get_papers_has_ref():
 
 
 def batch_create_txt():
-    for pdf in Path('/Users/chenjunbiao/project/graduation_project/degree_paper').rglob("*.pdf"):
-        with open('/Users/chenjunbiao/project/graduation_project/degree_paper_survey/' + pdf.stem + '.txt', 'w') as f:
+    for docx in Path('/Users/chenjunbiao/Desktop/target_paper').rglob("*.docx"):
+        if 'Pdf' in docx.stem:
+            continue
+        with open(str(docx.parent.joinpath(docx.stem + '.txt')), 'w') as f:
             f.write('')
 
 
@@ -65,6 +67,19 @@ def get_downloaded_list():
     for r in result:
         name_list.append((r.parent.name, r.stem, r.stat().st_size / 1024))
     pd.DataFrame(columns={'paper_title', 'title', 'size'}, data=name_list).to_csv('downloaded_files.csv', index=False)
+
+
+def find_all_file_recursively(dir_path, suffix):
+    return Path(dir_path).rglob('*' + suffix)
+
+
+def regulate_name():
+    for p in Path('/Users/chenjunbiao/Desktop/train_data/ref_paper/').rglob('*.caj*'):
+        # print(p)
+        # print(p.stem.split('.caj')[0])
+        stem = p.stem.split('.caj')[0]
+        print(stem)
+        shutil.move(str(p), str(p.with_name(stem + p.suffix)))
 
 
 if __name__ == '__main__':
@@ -77,4 +92,5 @@ if __name__ == '__main__':
 """
     # get_papers_has_ref()
     # batch_create_txt()
-    get_downloaded_list()
+    # get_downloaded_list()
+    regulate_name()
