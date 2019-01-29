@@ -9,9 +9,9 @@ import logging
 import math
 import requests
 import threading
-
+import time
 sys.path.append('/home/zengchuan/carawler/')
-from datetime import datetime, time
+from datetime import datetime
 from pathlib import Path
 from bs4 import BeautifulSoup
 from crawler.src.wanfang.orm import Mysql
@@ -265,7 +265,7 @@ def down_caj(ref_down_df, t_id):
         print(row['ref_title'], row['uuid'], type(row['ref_title']), type(row['uuid']))
         save_path = save_path.joinpath(row['ref_title'] + "&&" + row['uuid'] + '.caj')
         try:
-            html_bs('http://kns.cnki.net'+row['ref_href'])
+            cnki.get_html('http://kns.cnki.net'+row['ref_href'])
             sleep_time = random.randint(1, 15)
             time.sleep(sleep_time)
             cnki.download_caj(down_link, str(save_path))
