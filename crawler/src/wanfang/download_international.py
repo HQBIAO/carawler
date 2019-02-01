@@ -4,6 +4,9 @@
 
 import pandas as pd
 import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 from crawler.src.wanfang.download_cnki import html_bs
 
@@ -45,7 +48,7 @@ def get_conclusion(bs):
 
 
 def get_abstract(bs):
-    abstract = bs.select('#abstract')
+    abstract = bs.select('#abstracts')
     if abstract:
         return abstract[0].text
     else:
@@ -53,7 +56,9 @@ def get_abstract(bs):
 
 
 def get_en_paper(url, abstract_func, introduction_func, conclusion_func):
-    bs = html_bs(url)
+    driver = webdriver.Chrome()
+    driver.get(url)
+    bs = BeautifulSoup(driver.page_source, 'html.parser')
     abstract_text = abstract_func(bs)
     introduction_text = introduction_func(bs)
     conclusion_text = conclusion_func(bs)
@@ -62,7 +67,8 @@ def get_en_paper(url, abstract_func, introduction_func, conclusion_func):
 
 if __name__ == '__main__':
     down_df = pd.read_csv('down_df.csv')
-    down_en_df = down_df[down_df['CurDBCode'] == 'SSJD']
-    for index, row in down_df.iterrows():
-        content_dict = get_en_paper(row['res'], get_abstract, get_introduction, get_conclusion)
-        print(content_dict)
+    down_en_df = down_df[down_df['res'].notnull()]
+    for index, row in down_en_df.iterrows():
+        if 'sciencedirect' in row['res']:
+            content_dict = get_en_paper(row['res'], get_abstract, get_introduction, get_conclusion)
+            print(content_dict)
