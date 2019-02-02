@@ -1,14 +1,12 @@
 # coding=utf-8
 # date:2019/2/1 下午7:45 
 # author:chenjunbiao
+import platform
 
 import pandas as pd
-import requests
+import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-
-from crawler.src.wanfang.download_cnki import html_bs
 
 
 def get_introduction(bs):
@@ -16,7 +14,7 @@ def get_introduction(bs):
     sections = body_div.findAll('section')
     intro_sec = None
     for section in sections:
-        h2 = section.find('h2')
+        h2 = section.find(re.compile('^h[1-6]$'))
         little_title = h2.text.lowwer()
         if 'introduction' in little_title:
             intro_sec = section
@@ -35,7 +33,7 @@ def get_conclusion(bs):
     sections = body_div.findAll('section')
     conclu_sec = None
     for section in sections:
-        h2 = section.find('h2')
+        h2 = section.find(re.compile('^h[1-6]$'))
         little_title = h2.text.lowwer()
         if 'conclusion' in little_title:
             conclu_sec = section
@@ -56,7 +54,10 @@ def get_abstract(bs):
 
 
 def get_en_paper(url, abstract_func, introduction_func, conclusion_func):
-    driver = webdriver.Chrome()
+    if platform.system() == 'Windows':
+        driver = webdriver.Chrome(r'C:\Users\lvzen\AppData\Local\Google\Chrome\Application\chromedriver.exe')
+    else:
+        driver = webdriver.Chrome()
     driver.get(url)
     bs = BeautifulSoup(driver.page_source, 'html.parser')
     abstract_text = abstract_func(bs)
