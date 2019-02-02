@@ -15,7 +15,7 @@ def get_introduction(bs):
     intro_sec = None
     for section in sections:
         h2 = section.find(re.compile('^h[1-6]$'))
-        little_title = h2.text.lowwer()
+        little_title = h2.text.lower()
         if 'introduction' in little_title:
             intro_sec = section
             continue
@@ -34,7 +34,7 @@ def get_conclusion(bs):
     conclu_sec = None
     for section in sections:
         h2 = section.find(re.compile('^h[1-6]$'))
-        little_title = h2.text.lowwer()
+        little_title = h2.text.lower()
         if 'conclusion' in little_title:
             conclu_sec = section
     conclusion_text = ""
