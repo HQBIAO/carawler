@@ -82,6 +82,14 @@ def regulate_name():
         shutil.move(str(p), str(p.with_name(stem + p.suffix)))
 
 
+def correct_windows_path(str1):
+    if isinstance(str1, str):
+        return str1.replace('\\', '&&').replace('/', '&&').replace(':', '&&').replace('*', '&&').replace('?',
+                                                                                                 '&&').replace(
+            '"', '&&').replace('|', '&&').replace('<', '&&').replace('>', '&&')
+    else:
+        return str1
+
 if __name__ == '__main__':
     # get_error_file()
     """
