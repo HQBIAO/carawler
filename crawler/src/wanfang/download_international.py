@@ -9,6 +9,8 @@ import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
+from crawler.src.common_utlis import correct_windows_path
+
 
 def get_introduction(bs):
     body_div = bs.find('div', {'id': 'body'})
@@ -91,6 +93,6 @@ if __name__ == '__main__':
                     file_name = row['ref_title'] + '&&' + row['uuid'] + '&&' + k + '&&empty.txt'
                 else:
                     file_name = row['ref_title'] + '&&' + row['uuid'] + '&&' + k + '&&exist.txt'
-                with save_path.joinpath(file_name).open('w') as f:
+                with save_path.joinpath(correct_windows_path(file_name)).open('w') as f:
                     f.write(v)
             print(content_dict)
