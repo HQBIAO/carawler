@@ -82,17 +82,20 @@ if __name__ == '__main__':
     down_df = pd.read_csv('down_df.csv')
     down_en_df = down_df[down_df['res'].notnull()]
     for index, row in down_en_df.iterrows():
-        save_path = Path.home().joinpath('sciencedirect', row['target_paper'], correct_windows_path(row['ref_title']))
-        if not save_path.exists():
-            save_path.mkdir(parents=True)
 
         if 'sciencedirect' in row['res']:
+            save_path = Path.home().joinpath('sciencedirect', row['target_paper'])
+            if not save_path.exists():
+                save_path.mkdir(parents=True)
             content_dict = get_en_paper(row['res'], get_abstract, get_introduction, get_conclusion)
-            for k, v in content_dict.items():
-                if len(v) < 30:
-                    file_name = row['ref_title'] + '&&' + row['uuid'] + '&&' + k + '&&empty.txt'
-                else:
-                    file_name = row['ref_title'] + '&&' + row['uuid'] + '&&' + k + '&&exist.txt'
-                with open(str(save_path.joinpath(correct_windows_path(file_name)))) as f:
-                    f.write(v)
+            with save_path.joinpath(row['ref_title'] + '&&' + row['uuid']+'.txt').open('w') as f:
+                f.write('EE')
+            # correct_windows_path(row['ref_title'])
+            # for k, v in content_dict.items():
+            #     if len(v) < 30:
+            #         file_name = row['ref_title'] + '&&' + row['uuid'] + '&&' + k + '&&empty.txt'
+            #     else:
+            #         file_name = row['ref_title'] + '&&' + row['uuid'] + '&&' + k + '&&exist.txt'
+            #     with open(str(save_path.joinpath(correct_windows_path(file_name)))) as f:
+            #         f.write(v)
             print(content_dict)
