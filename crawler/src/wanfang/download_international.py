@@ -11,6 +11,8 @@ from selenium import webdriver
 
 def get_introduction(bs):
     body_div = bs.find('div', {'id': 'body'})
+    if not body_div:
+        return 'body do not exist'
     sections = body_div.findAll('section')
     intro_sec = None
     for section in sections:
@@ -30,6 +32,8 @@ def get_introduction(bs):
 
 def get_conclusion(bs):
     body_div = bs.find('div', {'id': 'body'})
+    if not body_div:
+        return 'body do not exist'
     sections = body_div.findAll('section')
     conclu_sec = None
     for section in sections:
