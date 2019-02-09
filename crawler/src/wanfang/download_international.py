@@ -82,7 +82,7 @@ if __name__ == '__main__':
     down_df = pd.read_csv('down_df.csv')
     down_en_df = down_df[down_df['res'].notnull()]
     for index, row in down_en_df.iterrows():
-        save_path = Path.home().joinpath('sciencedirect', row['target_paper'], row['ref_title'])
+        save_path = Path.home().joinpath('sciencedirect', row['target_paper'], correct_windows_path(row['ref_title']))
         if not save_path.exists():
             save_path.mkdir(parents=True)
 
